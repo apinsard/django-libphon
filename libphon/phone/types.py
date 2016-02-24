@@ -3,8 +3,9 @@
 import re
 
 __all__ = [
-    'PhoneType', 'FrenchPhone',
-    'phone_types', 'get_phone_type',
+    'PhoneType', 'FrPhone', 'GpPhone', 'GfPhone', 'MqPhone', 'RePhone',
+    'YtPhone',
+    'get_phone_type',
 ]
 
 
@@ -15,7 +16,7 @@ def clean_number(value):
 class PhoneType(object):
 
     country_code = None
-    phone_country_code = None
+    country_calling_code = None
     expression = None
     mobile_expression = None
     default_separator = '-'
@@ -37,7 +38,7 @@ class PhoneType(object):
         if not number:
             return None
         return '+{code}{number}'.format(
-            code=cls.phone_country_code,
+            code=cls.country_calling_code,
             number=number.group('local'))
 
     @classmethod
@@ -48,9 +49,9 @@ class PhoneType(object):
 class FrPhone(PhoneType):
 
     country_code = 'FR'
-    phone_country_code = '33'
+    country_calling_code = '33'
     expression = re.compile('^(0|(00)?33)(?P<local>[1-9][0-9]{8})$')
-    mobile_expression = re.compile('^(0|(00)?33)6')
+    mobile_expression = re.compile('^(0|(00)?33)[67]')
     default_separator = ' '
 
     @classmethod
@@ -68,12 +69,74 @@ class FrPhone(PhoneType):
         number = separator.join(number_parts)
         if international:
             return '+{code} {number}'.format(
-                code=cls.phone_country_code, number=number)
+                code=cls.country_calling_code, number=number)
         else:
             return '0{}'.format(number)
 
 
+class GpPhone(FrPhone):
+
+    country_code = 'GP'
+    country_calling_code = '590'
+    expression = re.compile('^(0|(00)?590)(?P<local>[56]90[0-9]{6})$')
+    mobile_expression = re.compile('^(0|(00)?590)6')
+
+    @classmethod
+    def format(cls, value, separator=None, international=True):
+        if separator is None:
+            separator = cls.default_separator
+        value = clean_number(value)
+        number = cls.expression.match(value)
+        if not number:
+            return None
+        number = number.group('local')
+        head = number[0:3]
+        tail = number[3:]
+        number_parts = [head] + [tail[i:i+2] for i in range(len(tail)//2)]
+        number = separator.join(number_parts)
+        if international:
+            return '+{code} {number}'.format(
+                code=cls.country_calling_code, number=number)
+        else:
+            return '0 {}'.format(number)
+
+
+class GfPhone(GpPhone):
+
+    country_code = 'GF'
+    country_calling_code = '594'
+    expression = re.compile('^(0|(00)?594)(?P<local>[56]94[0-9]{6})$')
+    mobile_expression = re.compile('^(0|(00)?594)6')
+
+
+class MqPhone(GpPhone):
+
+    country_code = 'MQ'
+    country_calling_code = '596'
+    expression = re.compile('^(0|(00)?594)(?P<local>[56]96[0-9]{6})$')
+    mobile_expression = re.compile('^(0|(00)?596)6')
+
+
+class RePhone(GpPhone):
+
+    country_code = 'RE'
+    country_calling_code = '262'
+    expression = re.compile('^(0|(00)?262)(?P<local>(26|69)2[0-9]{6})$')
+    mobile_expression = re.compile('^(0|(00)?262)6')
+
+
+class YtPhone(RePhone):
+
+    country_code = 'YT'
+    expression = re.compile('^(0|(00)?262)(?P<local>(26|63)9[0-9]{6})$')
+
+
 phone_types = [
+    YtPhone,
+    RePhone,
+    MqPhone,
+    GfPhone,
+    GpPhone,
     FrPhone,
 ]
 

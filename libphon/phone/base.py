@@ -25,10 +25,16 @@ class Phone(object):
         return self._type is not None
 
     def is_mobile(self):
-        return self.is_valid() and self._type.is_mobile(self.value)
+        return self.is_valid() and self._type.is_mobile(self._value)
 
     def get_country(self):
         if self.is_valid():
             return self._type.country_code
+        else:
+            return None
+
+    def format(self, separator=None, international=True):
+        if self.is_valid():
+            return self._type.format(self._value, separator, international)
         else:
             return None
