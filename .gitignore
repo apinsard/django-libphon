@@ -1,0 +1,9 @@
+*.py[co]
+*.sw[po]
+*~
+*.log
+
+/secrets.json
+/media/
+/tmp/
+/.sass-cache/
