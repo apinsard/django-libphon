@@ -50,7 +50,7 @@ class Phone(object):
         else:
             return self.value
 
-    def send_sms(self, message, send_date=None):
-        backend = get_sms_backend()
-        sms = backend(message, self, send_date)
+    def send_sms(self, message, **kwargs):
+        backend = kwargs.pop('backend', get_sms_backend())
+        sms = backend(message, self, **kwargs)
         sms.send()
