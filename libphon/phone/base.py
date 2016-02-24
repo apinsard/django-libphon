@@ -2,6 +2,8 @@
 # Copyright (c) 2016 Aladom SAS & Hosting Dvpt SAS
 from .types import get_phone_type, clean_number
 
+from ..sms.backends import get_backend as get_sms_backend
+
 __all__ = [
     'Phone',
 ]
@@ -47,3 +49,8 @@ class Phone(object):
             return self._type.format(self._value, separator, international)
         else:
             return self.value
+
+    def send_sms(self, message, send_date=None):
+        backend = get_sms_backend()
+        sms = backend(message, self, send_date)
+        sms.send()
