@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2016 Aladom SAS & Hosting Dvpt SAS
-from .types import get_phone_type
+from .types import get_phone_type, clean_number
 
 __all__ = [
     'Phone',
@@ -11,7 +11,7 @@ class Phone(object):
 
     @property
     def value(self):
-        return self._value
+        return self.get_cleaned_value()
 
     @value.setter
     def value(self, value):
@@ -20,6 +20,9 @@ class Phone(object):
 
     def __init__(self, value):
         self.value = value
+
+    def __str__(self):
+        return self._value
 
     def is_valid(self):
         return self._type is not None
@@ -33,8 +36,14 @@ class Phone(object):
         else:
             return None
 
+    def get_cleaned_value(self):
+        if self.is_valid():
+            return self._type.clean(self._value)
+        else:
+            return clean_number(self._value)
+
     def format(self, separator=None, international=True):
         if self.is_valid():
             return self._type.format(self._value, separator, international)
         else:
-            return None
+            return self.value

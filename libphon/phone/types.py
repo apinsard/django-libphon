@@ -5,7 +5,7 @@ import re
 __all__ = [
     'PhoneType', 'FrPhone', 'GpPhone', 'GfPhone', 'MqPhone', 'RePhone',
     'YtPhone',
-    'get_phone_type',
+    'clean_number', 'get_phone_type',
 ]
 
 
