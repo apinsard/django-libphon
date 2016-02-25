@@ -25,3 +25,12 @@ class PhoneField(CharField):
 
     def get_prep_value(self, value):
         return str(value)
+
+    def contribute_to_class(self, cls, name, *args, **kwargs):
+        super().contribute_to_class(self, cls, name, *args, **kwargs)
+
+        def get_FOO_display(s):
+            field = getattr(s, name)
+            return field.format() if field else '-'
+
+        setattr(cls, 'get_{}_display'.format(self.name), get_FOO_display)
