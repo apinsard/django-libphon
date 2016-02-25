@@ -121,7 +121,7 @@ class RePhone(GpPhone):
 
     country_code = 'RE'
     country_calling_code = '262'
-    expression = re.compile('^(0|(00)?262)(?P<local>(26|69)2[0-9]{6})$')
+    expression = re.compile('^(0|(00)?262)(?P<local>(26|69)[23][0-9]{6})$')
     mobile_expression = re.compile('^(0|(00)?262)6')
 
 
