@@ -27,7 +27,7 @@ class PhoneField(CharField):
         return str(value)
 
     def contribute_to_class(self, cls, name, *args, **kwargs):
-        super().contribute_to_class(self, cls, name, *args, **kwargs)
+        super().contribute_to_class(cls, name, *args, **kwargs)
 
         def get_FOO_display(s):
             field = getattr(s, name)
