@@ -7,7 +7,7 @@ import urllib.request
 from django.http import QueryDict
 from django.utils.module_loading import import_string
 
-from ..conf import SMS_API_KEY, SMS_BACKENDS
+from ..conf import SMS_API_KEY, SMS_BACKEND
 from ..exceptions import (
     PhoneError, InvalidPhoneNumber, NotAMobilePhone, ServiceUnavailable,
 )
@@ -48,9 +48,9 @@ class Backend(object):
 
 class UndefinedBackend(Backend):
 
-    def send(self):
-        raise PhoneError("You must configure an SMS backend "
-                         "in order to send SMS messages.")
+    def __init__(self, *args, **kwargs):
+        raise NotImplementedError("You must configure an SMS backend "
+                                  "in order to send SMS messages.")
 
 
 class Digitaleo(Backend):
@@ -99,7 +99,4 @@ class Digitaleo(Backend):
 
 
 def get_backend():
-    if SMS_BACKENDS:
-        return import_string(SMS_BACKENDS[0])
-    else:
-        return UndefinedBackend
+    return import_string(SMS_BACKEND)

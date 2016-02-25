@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 __all__ = [
-    'SMS_API_KEY', 'SMS_BACKENDS',
+    'SMS_BACKEND', 'SMS_API_KEY',
 ]
 
 
@@ -25,5 +25,6 @@ def get_setting(key, *args):
     return value
 
 
+SMS_BACKEND = get_setting('SMS_BACKEND',
+                          'libphon.sms.backends.UndefinedBackend')
 SMS_API_KEY = get_setting('SMS_API_KEY', None)
-SMS_BACKENDS = get_setting('SMS_BACKENDS', [])
