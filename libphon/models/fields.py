@@ -30,7 +30,10 @@ class PhoneField(CharField):
         super().contribute_to_class(cls, name, *args, **kwargs)
 
         def get_FOO_display(s):
-            field = getattr(s, name)
+            field = getattr(s, self.name)
             return field.format() if field else '-'
+        get_FOO_display.__name__ = 'get_{}_display'.format(self.name)
+        get_FOO_display.short_description = self.verbose_name
+        get_FOO_display.admin_order_field = self.name
 
-        setattr(cls, 'get_{}_display'.format(self.name), get_FOO_display)
+        setattr(cls, get_FOO_display.__name__, get_FOO_display)
