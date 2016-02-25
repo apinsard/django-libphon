@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2016 Aladom SAS & Hosting Dvpt SAS
 import re
-from urllib.error import URLError, HttpError
+from urllib.error import URLError, HTTPError
 import urllib.request
 
 from django.http import QueryDict
