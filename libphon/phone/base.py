@@ -25,6 +25,9 @@ class Phone(object):
 
     def __str__(self):
         return self._value
+    
+    def __len__(self):
+        return len(self._value)
 
     def is_valid(self):
         return self._type is not None
