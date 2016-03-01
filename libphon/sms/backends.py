@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2016 Aladom SAS & Hosting Dvpt SAS
 import re
-from urllib.error import URLError, HTTPError
-import urllib.request
+from urllib.error import HTTPError
+from urllib.request import urlopen
 
 from django.http import QueryDict
 from django.utils.module_loading import import_string
@@ -59,6 +59,14 @@ class Digitaleo(Backend):
     response_expr = re.compile('^([a-z_]+)=(.*)$', re.M)
 
     def send(self):
+        """Send the SMS through Digitaleo API.
+        May raise `InvalidPhoneNumber` if the phone number is not valid.
+        May raise `NotAMobilePhone` if the phone number is not detected as
+        mobile phone.
+        May raise `ServiceUnavailable` if an error occurs when attempting to
+        reach Digitaleo API.
+        May raise `PhoneError` if something else failed with digitaleo.
+        """
         if not self.phone.is_valid():
             raise InvalidPhoneNumber(self.phone)
         if not self.phone.is_mobile():
@@ -72,11 +80,12 @@ class Digitaleo(Backend):
             querydict['date'] = self.send_date.isoformat()
         url = '{}?{}'.format(self.send_url, querydict.urlencode())
         try:
-            response = urllib.request.urlopen(url)
-        except (URLError, HttpError) as e:
+            with urlopen(url) as f:
+                response = f.read().decode('utf-8')
+        except HTTPError as e:
             raise ServiceUnavailable(e)
-        self.parse_response(response.read().decode('utf-8'))
-        if self.get_status == 'ko':
+        self.parse_response(response)
+        if self.get_status() == 'ko':
             raise PhoneError(self.response)
 
     def parse_response(self, response):
