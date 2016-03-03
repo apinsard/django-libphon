@@ -25,7 +25,7 @@ class Phone(object):
 
     def __str__(self):
         return self._value
-    
+
     def __len__(self):
         return len(self._value)
 
@@ -52,6 +52,9 @@ class Phone(object):
             return self._type.format(self._value, separator, international)
         else:
             return self.value
+
+    def local_format(self, separator=None):
+        return self.format(separator, international=False)
 
     def send_sms(self, message, **kwargs):
         backend = kwargs.pop('backend', get_sms_backend())

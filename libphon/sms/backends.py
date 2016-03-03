@@ -24,7 +24,7 @@ long_sms_max_length = 1024
 long_sms_single_max_length = 153
 
 
-class Backend(object):
+class Backend:
 
     def __init__(self, message, phone, send_date=None):
         self.message = message
