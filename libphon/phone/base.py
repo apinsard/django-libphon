@@ -24,7 +24,7 @@ class Phone(object):
         self.value = value
 
     def __str__(self):
-        return self._value
+        return self._value or ''
 
     def __len__(self):
         return len(self._value)
