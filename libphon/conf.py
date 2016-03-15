@@ -27,4 +27,12 @@ def get_setting(key, *args):
 
 SMS_BACKEND = get_setting('SMS_BACKEND',
                           'libphon.sms.backends.UndefinedBackend')
+"""SMS backend to use to send SMS."""
+
 SMS_API_KEY = get_setting('SMS_API_KEY', None)
+"""The API key to access the SMS API."""
+
+DEV_PHONES = get_setting('DEV_PHONES', None)
+"""Prevents from sending SMS to other phone numbers than those specified here
+while in DEBUG mode.
+"""

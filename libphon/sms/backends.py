@@ -4,10 +4,11 @@ import re
 from urllib.error import HTTPError
 from urllib.request import urlopen
 
+from django.conf import settings
 from django.http import QueryDict
 from django.utils.module_loading import import_string
 
-from ..conf import SMS_API_KEY, SMS_BACKEND
+from ..conf import SMS_API_KEY, SMS_BACKEND, DEV_PHONES
 from ..exceptions import (
     PhoneError, InvalidPhoneNumber, NotAMobilePhone, ServiceUnavailable,
 )
@@ -28,11 +29,14 @@ class Backend:
 
     def __init__(self, message, phone, send_date=None):
         self.message = message
-        self.phone = phone
         if send_date:
             self.send_date = send_date.replace(microsecond=0)
         else:
             self.send_date = None
+        if settings.DEBUG and DEV_PHONES and phone not in DEV_PHONES:
+            self.phone = DEV_PHONES[0]
+        else:
+            self.phone = phone
 
     def get_length(self):
         return len(self.message) + sum(self.message.count(c)
