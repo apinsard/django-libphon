@@ -60,3 +60,16 @@ class Phone(object):
         backend = kwargs.pop('backend', get_sms_backend())
         sms = backend(message, self, **kwargs)
         sms.send()
+
+    def send_sms_async(self, message, **kwargs):
+        """Send SMS asynchroneously. Requires django channels."""
+        try:
+            from channels import Channel
+        except ImportError:
+            raise ImportError(
+                "This service requires Django Channels. You can install it "
+                "with: pip install channels"
+            )
+        Channel('libphon.send_sms').send(dict(
+            phone=self.value, message=message, **kwargs
+        ))
