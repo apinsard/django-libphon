@@ -12,6 +12,7 @@ from ..conf import SMS_API_KEY, SMS_BACKEND, DEV_PHONES
 from ..exceptions import (
     PhoneError, InvalidPhoneNumber, NotAMobilePhone, ServiceUnavailable,
 )
+from ..phone import Phone
 
 __all__ = [
     'Backend', 'UndefinedBackend', 'Digitaleo',
@@ -34,9 +35,10 @@ class Backend:
         else:
             self.send_date = None
         if settings.DEBUG and DEV_PHONES and phone not in DEV_PHONES:
-            self.phone = DEV_PHONES[0]
-        else:
-            self.phone = phone
+            phone = DEV_PHONES[0]
+        if not isinstance(phone, Phone):
+            phone = Phone(phone)
+        self.phone = phone
 
     def get_length(self):
         return len(self.message) + sum(self.message.count(c)
