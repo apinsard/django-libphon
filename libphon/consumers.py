@@ -13,7 +13,7 @@ class SendSmsConsumer(BaseConsumer):
     def _send_sms(self, phone, message, send_date=None):
         """Send the SMS and return the backend instance."""
         SMS = get_backend()
-        sms = SMS(phone, message, send_date=send_date)
+        sms = SMS(message, phone, send_date=send_date)
         sms.send()
         return sms
 
