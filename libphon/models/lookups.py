@@ -17,5 +17,5 @@ class PhoneMatchLookup(Regex):
             value = r'^(\+?(33|590)|0+)[^0-9]*{}[^0-9]*'.format(
                 r'[^0-9]*'.join(m.group(2)))
         else:
-            value = r'^$'
+            value = r'^__NOMATCH__$'
         return super().get_db_prep_lookup(value, connection)
