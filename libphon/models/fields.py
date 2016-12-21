@@ -4,6 +4,11 @@ from django.db.models import CharField
 from django.utils.translation import ugettext_lazy as _
 
 from ..phone import Phone
+from .lookups import PhoneMatchLookup
+
+__all__ = [
+    'PhoneField',
+]
 
 
 class PhoneField(CharField):
@@ -37,3 +42,6 @@ class PhoneField(CharField):
         get_FOO_display.admin_order_field = self.name
 
         setattr(cls, get_FOO_display.__name__, get_FOO_display)
+
+
+PhoneField.register_lookup(PhoneMatchLookup)
