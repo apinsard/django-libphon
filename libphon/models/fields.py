@@ -43,5 +43,7 @@ class PhoneField(CharField):
 
         setattr(cls, get_FOO_display.__name__, get_FOO_display)
 
-
-PhoneField.register_lookup(PhoneMatchLookup)
+    def get_lookup(self, lookup_name):
+        if lookup_name == 'matches':
+            return PhoneMatchLookup
+        return super().get_lookup(lookup_name)

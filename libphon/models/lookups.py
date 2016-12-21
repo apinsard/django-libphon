@@ -10,8 +10,6 @@ __all__ = [
 
 class PhoneMatchLookup(Regex):
 
-    lookup_name = 'matches'
-
     def get_db_prep_lookup(self, value, connection):
         print(value)
         value = re.sub(r'[^0-9]', '', value)
