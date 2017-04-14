@@ -9,7 +9,7 @@ __all__ = [
 ]
 
 
-class Phone(object):
+class Phone:
 
     @property
     def value(self):
@@ -24,8 +24,10 @@ class Phone(object):
         self.value = value
         
     def __eq__(self, other):
-        if not isinstance(other, self.__class__):
+        if isinstance(other, str):
             other = self.__class__(other)
+        if not isinstance(other, self.__class__):
+            return False
         return self.value == other.value
 
     def __str__(self):
