@@ -22,6 +22,11 @@ class Phone(object):
 
     def __init__(self, value):
         self.value = value
+        
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            other = self.__class__(other)
+        return self.value == other.value
 
     def __str__(self):
         return self._value or ''
