@@ -24,7 +24,7 @@ class PhoneField(CharField):
         return Phone(value)
 
     def to_python(self, value):
-        if isinstance(value, Phone)
+        if isinstance(value, Phone):
             return value
         if not value:
             return None
