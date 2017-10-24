@@ -10,6 +10,7 @@ __all__ = [
 
 
 def clean_number(value):
+    value = value.upper().replace('O', '0')
     return re.sub('[^0-9]', '', value)
 
 
