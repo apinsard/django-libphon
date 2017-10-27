@@ -31,6 +31,8 @@ class PhoneField(CharField):
         return Phone(value)
 
     def get_prep_value(self, value):
+        if value is None:
+            return ""
         return str(value)
 
     def contribute_to_class(self, cls, name, *args, **kwargs):
