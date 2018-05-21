@@ -10,6 +10,7 @@ __all__ = [
 
 
 def clean_number(value):
+    value = value.upper().replace('O', '0')
     return re.sub('[^0-9]', '', value)
 
 
@@ -65,7 +66,7 @@ class FrPhone(PhoneType):
         number = number.group('local')
         head = number[0]
         tail = number[1:]
-        number_parts = [head] + [tail[i:i+2] for i in range(len(tail)//2)]
+        number_parts = [head] + [tail[i:i+2] for i in range(len(tail)) if i%2 == 0]
         number = separator.join(number_parts)
         if international:
             return '+{code} {number}'.format(
@@ -92,7 +93,7 @@ class GpPhone(FrPhone):
         number = number.group('local')
         head = number[0:3]
         tail = number[3:]
-        number_parts = [head] + [tail[i:i+2] for i in range(len(tail)//2)]
+        number_parts = [head] + [tail[i:i+2] for i in range(len(tail)) if i%2 == 0]
         number = separator.join(number_parts)
         if international:
             return '+{code} {number}'.format(

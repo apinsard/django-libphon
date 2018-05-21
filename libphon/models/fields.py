@@ -19,16 +19,20 @@ class PhoneField(CharField):
         super().__init__(*args, **kwargs)
 
     def from_db_value(self, value, expression, connection, context):
-        if value is None:
-            return value
+        if not value:
+            return None
         return Phone(value)
 
     def to_python(self, value):
-        if isinstance(value, Phone) or value is None:
+        if isinstance(value, Phone):
             return value
+        if not value:
+            return None
         return Phone(value)
 
     def get_prep_value(self, value):
+        if value is None:
+            return ""
         return str(value)
 
     def contribute_to_class(self, cls, name, *args, **kwargs):
