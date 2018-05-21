@@ -62,14 +62,12 @@ class Phone(object):
         sms.send()
 
     def send_sms_async(self, message, **kwargs):
-        """Send SMS asynchroneously. Requires django channels."""
+        """Send SMS asynchroneously. Requires Celery."""
         try:
-            from channels import Channel
+            from ..tasks import send_sms
         except ImportError:
             raise ImportError(
-                "This service requires Django Channels. You can install it "
-                "with: pip install channels"
+                "This service requires Celery. You can install it with: "
+                "pip install celery"
             )
-        Channel('libphon.send_sms').send(dict(
-            phone=self.value, message=message, **kwargs
-        ))
+        send_sms.delay(self.value, message, **kwargs)
