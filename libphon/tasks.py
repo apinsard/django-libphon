@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from celery import shared_task
 
-from .sms.backend import get_backend
+from .sms.backends import get_backend
 
 
 @shared_task
