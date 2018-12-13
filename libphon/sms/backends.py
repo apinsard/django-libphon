@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2016 Aladom SAS & Hosting Dvpt SAS
+import logging
 import re
 from urllib.error import HTTPError
 from urllib.request import urlopen
@@ -8,13 +9,18 @@ from django.conf import settings
 from django.http import QueryDict
 from django.utils.module_loading import import_string
 
-from ..conf import SMS_API_KEY, SMS_BACKEND, DEV_PHONES
+import requests
+
+from ..conf import SMS_API_KEY, SMS_BACKEND, SMS_DEFAULT_FROM, DEV_PHONES
 from ..exceptions import (
     PhoneError, InvalidPhoneNumber, NotAMobilePhone, ServiceUnavailable,
 )
 
 __all__ = [
-    'Backend', 'UndefinedBackend', 'Digitaleo',
+    'Backend',
+    'Digitaleo',
+    'Mailjet',
+    'UndefinedBackend',
     'get_backend',
 ]
 
@@ -24,10 +30,12 @@ sms_max_length = 160
 long_sms_max_length = 1024
 long_sms_single_max_length = 153
 
+logger = logging.getLogger('libphon.sms')
+
 
 class Backend:
 
-    def __init__(self, message, phone, send_date=None):
+    def __init__(self, message, phone, send_date=None, from_header=None):
         self.message = message
         if send_date:
             self.send_date = send_date.replace(microsecond=0)
@@ -39,6 +47,7 @@ class Backend:
             from ..phone import Phone  # import here to avoid circular imports
             phone = Phone(phone)
         self.phone = phone
+        self.from_header = from_header or SMS_DEFAULT_FROM
 
     def get_length(self):
         return len(self.message) + sum(self.message.count(c)
@@ -64,6 +73,11 @@ class Digitaleo(Backend):
     send_url = 'https://www.ecosms.fr/ecosms.php'
     response_expr = re.compile('^([a-z_]+)=(.*)$', re.M)
 
+    def __init__(self, message, phone, send_date=None, from_header=None):
+        if from_header:
+            logger.warning("from_header not supported by Digitaleo backend.")
+        return super().__init__(message, phone, send_date, None)
+
     def send(self):
         """Send the SMS through Digitaleo API.
         May raise `InvalidPhoneNumber` if the phone number is not valid.
@@ -71,7 +85,7 @@ class Digitaleo(Backend):
         mobile phone.
         May raise `ServiceUnavailable` if an error occurs when attempting to
         reach Digitaleo API.
-        May raise `PhoneError` if something else failed with digitaleo.
+        May raise `PhoneError` if something else failed with Digitaleo.
         """
         if not self.phone.is_valid():
             raise InvalidPhoneNumber(self.phone)
@@ -111,6 +125,61 @@ class Digitaleo(Backend):
 
     def get_sms_id(self):
         return self.response.get('sms_id', None)
+
+
+class Mailjet(Backend):
+
+    send_url = 'https://api.mailjet.com/v4/sms-send'
+
+    def __init__(self, message, phone, send_date=None, from_header=None):
+        if send_date:
+            logger.warning("send_date not supported by Mailjet backend.")
+        return super().__init__(message, phone, None, from_header)
+
+    def send(self):
+        """Send the SMS through Mailjet API.
+        May raise `InvalidPhoneNumber` if the phone number is not valid.
+        May raise `NotAMobilePhone` if the phone number is not detected as
+        mobile phone.
+        May raise `ServiceUnavailable` if an error occurs when attempting to
+        reach Mailjet API.
+        May raise `PhoneError` if something else failed with Mailjet.
+        """
+        if not self.phone.is_valid():
+            raise InvalidPhoneNumber(self.phone)
+        if not self.phone.is_mobile():
+            raise NotAMobilePhone(self.phone)
+        request_payload = {
+            'From': self.from_header,
+            'To': self.phone.format(separator='', international=True),
+            'Text': self.message,
+        }
+        request_headers = {'Authorization': 'Bearer {}'.format(SMS_API_KEY)}
+        response = requests.post(
+            self.send_url, json=request_payload, headers=request_headers)
+        if response.status_code >= 500:
+            raise ServiceUnavailable(response.text)
+        self.parse_response()
+        if self.get_status() != 2:
+            raise PhoneError(self.response)
+
+    def parse_response(self, response):
+        self.response = response.json()
+
+    def get_status(self):
+        try:
+            return self.response['Status']['Code']
+        except KeyError:
+            return -1
+
+    def get_status_message(self):
+        try:
+            return self.response['Status']['Description']
+        except KeyError:
+            return ''
+
+    def get_sms_id(self):
+        return self.response.get('MessageId', None)
 
 
 def get_backend():

@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 __all__ = [
-    'SMS_BACKEND', 'SMS_API_KEY',
+    'SMS_BACKEND', 'SMS_API_KEY', 'SMS_DEFAULT_FROM', 'DEV_PHONES',
 ]
 
 
@@ -31,6 +31,9 @@ SMS_BACKEND = get_setting('SMS_BACKEND',
 
 SMS_API_KEY = get_setting('SMS_API_KEY', None)
 """The API key to access the SMS API."""
+
+SMS_DEFAULT_FROM = get_setting('SMS_DEFAULT_FROM', "Django Libphon")
+"""The default From header displayed to SMS recipients."""
 
 DEV_PHONES = get_setting('DEV_PHONES', None)
 """Prevents from sending SMS to other phone numbers than those specified here
