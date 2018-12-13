@@ -2,8 +2,6 @@
 # Copyright (c) 2016 Aladom SAS & Hosting Dvpt SAS
 import logging
 import re
-from urllib.error import HTTPError
-from urllib.request import urlopen
 
 from django.conf import settings
 from django.http import QueryDict
@@ -99,17 +97,15 @@ class Digitaleo(Backend):
         if self.send_date:
             querydict['date'] = self.send_date.isoformat()
         url = '{}?{}'.format(self.send_url, querydict.urlencode())
-        try:
-            with urlopen(url) as f:
-                response = f.read().decode('utf-8')
-        except HTTPError as e:
-            raise ServiceUnavailable(e)
+        response = requests.get(url)
+        if response.status_code >= 500:
+            raise ServiceUnavailable(response.text)
         self.parse_response(response)
         if self.get_status() == 'ko':
             raise PhoneError(self.response)
 
     def parse_response(self, response):
-        self.response = dict(self.response_expr.findall(response))
+        self.response = dict(self.response_expr.findall(response.text))
 
     def get_status(self):
         if 'statut' in self.response:
@@ -159,7 +155,7 @@ class Mailjet(Backend):
             self.send_url, json=request_payload, headers=request_headers)
         if response.status_code >= 500:
             raise ServiceUnavailable(response.text)
-        self.parse_response()
+        self.parse_response(response)
         if self.get_status() != 2:
             raise PhoneError(self.response)
 
