@@ -9,9 +9,9 @@ from django.utils.module_loading import import_string
 
 import requests
 
-from ..conf import SMS_API_KEY, SMS_BACKEND, SMS_DEFAULT_FROM, DEV_PHONES
+from ..conf import DEV_PHONES, SMS_API_KEY, SMS_BACKEND, SMS_DEFAULT_FROM
 from ..exceptions import (
-    PhoneError, InvalidPhoneNumber, NotAMobilePhone, ServiceUnavailable,
+    InvalidPhoneNumber, NotAMobilePhone, PhoneError, ServiceUnavailable,
 )
 
 __all__ = [
@@ -147,7 +147,7 @@ class Mailjet(Backend):
             raise NotAMobilePhone(self.phone)
         request_payload = {
             'From': self.from_header,
-            'To': self.phone.format(separator='', international=True),
+            'To': self.phone.get_cleaned_value(),
             'Text': self.message,
         }
         request_headers = {'Authorization': 'Bearer {}'.format(SMS_API_KEY)}
