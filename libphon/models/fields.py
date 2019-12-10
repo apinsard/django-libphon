@@ -18,7 +18,7 @@ class PhoneField(CharField):
         kwargs.setdefault('max_length', 20)
         super().__init__(*args, **kwargs)
 
-    def from_db_value(self, value, expression, connection, context):
+    def from_db_value(self, value, expression, connection):
         if not value:
             return None
         return Phone(value)
