@@ -156,7 +156,7 @@ class Mailjet(Backend):
         if response.status_code >= 500:
             raise ServiceUnavailable(response.text)
         self.parse_response(response)
-        if self.get_status() != 2:
+        if self.get_status() not in [1, 2, 3]:
             raise PhoneError(self.response)
 
     def parse_response(self, response):
