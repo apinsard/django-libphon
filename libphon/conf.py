@@ -5,6 +5,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 __all__ = [
     'SMS_BACKEND', 'SMS_API_KEY', 'SMS_DEFAULT_FROM', 'DEV_PHONES',
+    'PREFERRED_LOCAL_COUNTRIES',
 ]
 
 
@@ -38,4 +39,9 @@ SMS_DEFAULT_FROM = get_setting('SMS_DEFAULT_FROM', "Django Libphon")
 DEV_PHONES = get_setting('DEV_PHONES', None)
 """Prevents from sending SMS to other phone numbers than those specified here
 while in DEBUG mode.
+"""
+
+PREFERRED_LOCAL_COUNTRIES = get_setting('PREFERRED_LOCAL_COUNTRIES', None)
+"""List of countries in preferred order to check for local phone number
+if country code is not provided.
 """
