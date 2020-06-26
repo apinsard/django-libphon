@@ -73,7 +73,7 @@ class Phone:
         if not self.is_valid():
             return False
         if self._value.country_code == 33:
-            return str(self._value.national_number)[0] in ['6' '7']
+            return str(self._value.national_number)[0] in ['6', '7']
         return None
 
     def get_country(self):
@@ -91,12 +91,15 @@ class Phone:
 
     def format(self, separator=None, international=True):
         if self.is_valid():
-            return phonenumbers.format_number(self._value, (
+            value = phonenumbers.format_number(self._value, (
                 phonenumbers.PhoneNumberFormat.INTERNATIONAL if international
                 else phonenumbers.PhoneNumberFormat.NATIONAL
             ))
         else:
-            return self.value
+            value = self.value
+        if separator:
+            value = value.replace(' ', separator)
+        return value
 
     def local_format(self, separator=None):
         return self.format(separator, international=False)

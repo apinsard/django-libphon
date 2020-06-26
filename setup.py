@@ -18,7 +18,7 @@ setup(
     url='https://gitlab.com/cocoonr/django-libphon',
     author='Aladom & Cocoonr',
     author_email='contact@aladom.fr, contact@cocoonr.fr',
-    instal_requires=['phonenumbers'],
+    install_requires=['phonenumbers'],
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',
