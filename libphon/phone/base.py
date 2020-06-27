@@ -85,9 +85,11 @@ class Phone:
 
     def get_cleaned_value(self):
         if self.is_valid():
-            return phonenumbers.normalize_digits_only(self._value)
+            return phonenumbers.format_number(
+                self._value, phonenumbers.PhoneNumberFormat.E164)
         else:
-            return phonenumbers.normalize_digits_only(self._raw_value)
+            plus = ('+' if '+' in self._raw_value else '')
+            return plus + phonenumbers.normalize_digits_only(self._raw_value)
 
     def format(self, separator=None, international=True):
         if self.is_valid():
